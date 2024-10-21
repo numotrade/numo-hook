@@ -5,7 +5,7 @@
 
 ### A cryptocurrency designed to be stable. 
 
-Numo (NDR) is backed by a basket of FX pairs with its volatility offset by the premium earned from selling options on the underlying liquidity. The design of Numo draws it's inspiration from the IMF Special Drawing Rights (SDR) design and the [replicating market makers](https://arxiv.org/abs/2103.14769) paper that shows virtually any option strategy can be constructed using CFMMs.
+Numo (NDR) is backed by a basket of FX pairs with its volatility offset by the premium earned from selling options on the underlying liquidity. The economic design of Numo draws it's inspiration from the IMF Special Drawing Rights (SDR) and the [replicating market makers](https://arxiv.org/abs/2103.14769) paper that shows virtually any option strategy can be constructed using CFMMs.
 
 The smart contract suite for Numo is contained in this repository. It implements the [RMM-01](https://www.primitive.xyz/papers/Whitepaper.pdf)  invariant, concieved by the wonderful [@primitivefinance](https://github.com/primitivefinance) team, as a Uniswap V4 hook. 
 
