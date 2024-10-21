@@ -5,6 +5,8 @@
 
 ### A cryptocurrency designed to be stable. 
 
+Numo (NMX) is backed by a basket of FX pairs with its volatility offset by selling options on the underlying liquidity. The design of Numo draws it's inpiration from the IMF Special Drawing Rights (SDR) design. 
+
 The solidity implementation for Numo is contained in this repository and is inspired by the [replicating market makers](https://arxiv.org/abs/2103.14769) paper that shows virtually any option strategy can be constructed using CFMMs and [RMM-01](https://www.primitive.xyz/papers/Whitepaper.pdf) built by the wonderful [@primitivefinance](https://github.com/primitivefinance) team. 
 
 
