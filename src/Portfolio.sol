@@ -16,8 +16,6 @@ import {IHooks} from "v4-core/src/interfaces/IHooks.sol";
 
 import {NumoToken} from "./NumoToken.sol";
 import {PortfolioUtils} from "./PortfolioUtils.sol";
-import {VolatilityUtils} from "./VolatilityUtils.sol";
-import {VolatilityUtils} from "./VolatilityUtils.sol";
 
 // Define the SwapStorage struct
 struct SwapStorage {
@@ -39,8 +37,10 @@ struct SwapStorage {
 contract Portfolio is BaseHook, Ownable {
     using PoolIdLibrary for PoolKey;
 
-    // State variable to store the decimal places of the pooled tokens
+    // State variables
     uint8[] public decimals;
+    SwapStorage public swapStorage;
+    mapping(address => uint8) public tokenIndexes;
 
     /**
      * @notice Initializes this Swap contract with the given parameters.
@@ -53,7 +53,7 @@ contract Portfolio is BaseHook, Ownable {
      * eg 8 for WBTC. Cannot be larger than POOL_PRECISION_DECIMALS
      * @param _numoTokenName the long-form name of the token to be deployed
      * @param _numoTokenSymbol the short symbol for the token to be deployed
-     * @param _a the amplification coefficient * n * (n - 1). See the
+     * @param _volatility the amplification coefficient * n * (n - 1). See the
      * StableSwap paper for details
      * @param _fee default swap fee to be initialized with
      * @param _adminFee default adminFee to be initialized with
@@ -84,42 +84,29 @@ contract Portfolio is BaseHook, Ownable {
         uint256 _fee,
         uint256 _adminFee
     ) BaseHook(_poolManager) Ownable(msg.sender) payable {
-        // todo configre Ownable's params
-
-        // Check _pooledTokens and precisions parameter
         require(_pooledTokens.length == 2, "_pooledTokens.length == 2");
-
-        // require(_pooledTokens.length > 1, "_pooledTokens.length <= 1");
-        // require(_pooledTokens.length <= 32, "_pooledTokens.length > 32");
         require(
             _pooledTokens.length == _decimals.length,
             "_pooledTokens decimals mismatch"
         );
 
-        // IERC20[] memory _sortedPooledTokens = new IERC20[](decimals.length);
+        decimals = _decimals; // Store the decimals in the state variable
 
-        // address tokenA =  address(_pooledTokens[0]);
-        // address tokenB =  address(_pooledTokens[1]);
-
-        // uint8 decimalA;
-        // uint8 decimalB;
-
-        (address quote, address asset, uint8 quoteDecimal, uint8 assetDecimal)
-            = address(_pooledTokens[0]) < address(_pooledTokens[1]) ?
-                (address(_pooledTokens[0]), address(_pooledTokens[1]), _decimals[0], _decimals[1])
+        (address asset, address quote, uint8 assetDecimal, uint8 quoteDecimal) =
+            address(_pooledTokens[0]) < address(_pooledTokens[1])
+                ? (address(_pooledTokens[0]), address(_pooledTokens[1]), _decimals[0], _decimals[1])
                 : (address(_pooledTokens[1]), address(_pooledTokens[0]), _decimals[1], _decimals[0]);
 
-        _pooledTokens[0] = IERC20(quote);
-        _pooledTokens[1] = IERC20(asset);
+        _pooledTokens[0] = IERC20(asset);
+        _pooledTokens[1] = IERC20(quote);
 
-        _decimals[0] = quoteDecimal;
-        _decimals[1] = assetDecimal;
+        decimals[0] = assetDecimal;
+        decimals[1] = quoteDecimal;
 
         uint256[] memory precisionMultipliers = new uint256[](decimals.length);
 
         for (uint8 i = 0; i < _pooledTokens.length; i++) {
             if (i > 0) {
-                // Check if index is already used. Check if 0th element is a duplicate.
                 require(
                     tokenIndexes[address(_pooledTokens[i])] == 0 &&
                         _pooledTokens[0] != _pooledTokens[i],
@@ -136,15 +123,14 @@ contract Portfolio is BaseHook, Ownable {
             );
 
             precisionMultipliers[i] =
-                 10 **
+                10 **
                     (uint256(PortfolioUtils.POOL_PRECISION_DECIMALS) -
                         uint256(decimals[i]));
 
             tokenIndexes[address(_pooledTokens[i])] = i;
         }
 
-        // Check _a, _fee, _adminFee, _withdrawFee parameters
-        require(_volatility < AmplificationUtilsV2.MAX_A, "_a exceeds maximum");
+        require(_volatility < VolatilityUtils.MAX_VOLATILITY, "_volatility exceeds maximum");
         require(_fee < PortfolioUtils.MAX_SWAP_FEE, "_fee exceeds maximum");
         require(
             _adminFee < PortfolioUtils.MAX_ADMIN_FEE,
@@ -187,8 +173,8 @@ contract Portfolio is BaseHook, Ownable {
         // to do : initalize Uni Pool here or just store ?
 
         swapStorage.poolKey = PoolKey({
-          currency0: Currency.wrap(quote),
-          currency1: Currency.wrap(asset),
+          currency0: Currency.wrap(asset),
+          currency1: Currency.wrap(quote),
           fee: 3000,
           hooks: IHooks(address(this)),
           tickSpacing: 60
