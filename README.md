@@ -3,11 +3,13 @@
 [![Fuzz Testing](https://github.com/Uniswap/uniswap-v3-core/actions/workflows/fuzz-testing.yml/badge.svg)](https://github.com/numocash/numo/actions/workflows/fuzz-testing.yml)
 [![npm version](https://img.shields.io/npm/v/@uniswap/v3-core/latest.svg)](https://www.npmjs.com/package/@numocash/numo/v/latest)
 
-### A cryptocurrency designed to be stable. 
+### A market maker for call options on FX pairs (e.g. USD/EUR).
 
-Numo (NDR) is backed by a basket of FX pairs with its volatility offset by the premium earned from selling options on the underlying liquidity. The economic design of Numo draws it's inspiration from the IMF Special Drawing Rights (SDR) and the [replicating market makers](https://arxiv.org/abs/2103.14769) paper that shows virtually any option strategy can be constructed using CFMMs.
+The smart contract suite is a Uniswap V4 hook and is inspired by @primitivefinance's open source [RMM-01](https://github.com/primitivefinance/rmm) implementation and the [replicating market makers](https://arxiv.org/abs/2103.14769) paper that first proved any option strategy can be constructed using CFMMs.
 
-The smart contract suite for Numo is contained in this repository. It implements the [RMM-01](https://www.primitive.xyz/papers/Whitepaper.pdf)  invariant, concieved by the wonderful [@primitivefinance](https://github.com/primitivefinance) team, as a Uniswap V4 hook. 
+Liquidity providers on Numo are call sellers that earn premiums "theta decay." In the context of decentralized finance, these premiums are paid by traders who swap on the underlying liquidity. In the future, a batch auction can be implemented to match buyers and sellers. An integration with an exisiting options market can also be done. These would optimize the premiums earned for option sellers.
+
+Numo deploys a `market` instance for each FX pair. Each `market` can handle any two arbitrary ERC-20 token and follows the standard naming conventions seen in traditional FX markets (`base`/`quote`).
 
 ## Set up
 
