@@ -7,7 +7,7 @@
 
 The smart contract suite is a Uniswap V4 hook and is inspired by @primitivefinance's open source [RMM-01](https://github.com/primitivefinance/rmm) implementation and the [replicating market makers](https://arxiv.org/abs/2103.14769) paper that first proved any option strategy can be constructed using CFMMs.
 
-Liquidity providers on Numo are call sellers that earn premiums "theta decay." In the context of decentralized finance, these premiums are paid by traders who swap on the underlying liquidity. In the future, a batch auction can be implemented to match buyers and sellers. An integration with an exisiting options market can also be done. These would optimize the premiums earned for option sellers.
+Liquidity providers on Numo are sellers of european-style call options who earn a premium from "theta decay." In the context of decentralized finance, these premiums are paid by traders who swap on the underlying liquidity. In the future, a batch auction can be implemented to match buyers and sellers. An integration with an exisiting options market can also be done. These would optimize the premiums earned for option sellers.
 
 Numo deploys a `market` instance for each FX pair. Each `market` can handle any two arbitrary ERC-20 token and follows the standard naming conventions seen in traditional FX markets (`base`/`quote`).
 
